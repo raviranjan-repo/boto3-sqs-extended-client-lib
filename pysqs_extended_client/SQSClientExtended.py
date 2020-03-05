@@ -186,7 +186,7 @@ class SQSClientExtended(object):
 		print("receipt_handle={}".format(receipt_handle))
 		self.sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
 
-	def send_message(self, queue_url, message, message_attributes={}):
+	def send_message(self, queue_url, message, message_attributes={}, delay_seconds=0):
 		"""
 		Delivers a message to the specified queue and uploads the message payload
 		to Amazon S3 if necessary.
@@ -211,9 +211,9 @@ class SQSClientExtended(object):
 				raise ValueError('S3 bucket name cannot be null')
 			s3_key_message = json.dumps(self.__store_message_in_s3(message))
 			message_attributes[SQSExtendedClientConstants.RESERVED_ATTRIBUTE_NAME.value] = {'StringValue': str(self.__get_string_size_in_bytes(message)), 'DataType': 'Number'}
-			return self.sqs.send_message(QueueUrl=queue_url, MessageBody=s3_key_message, MessageAttributes=message_attributes)
+			return self.sqs.send_message(QueueUrl=queue_url, MessageBody=s3_key_message, MessageAttributes=message_attributes, DelaySeconds=delay_seconds)
 		else:
-			return self.sqs.send_message(QueueUrl=queue_url, MessageBody=message, MessageAttributes=message_attributes)
+			return self.sqs.send_message(QueueUrl=queue_url, MessageBody=message, MessageAttributes=message_attributes, DelaySeconds=delay_seconds)
 
 	def __store_message_in_s3(self, message_body):
 		"""
