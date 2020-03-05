@@ -179,10 +179,9 @@ class SQSClientExtended(object):
 		a message in the queue for longer than the queue's configured retention period,
 		Amazon SQS automatically deletes the message.
 
-		Additionally to purging the queue of the message any s3 referenced object will be deleted
+		S3 file is NOT deleted
 		"""
 		if self.__is_s3_receipt_handle(receipt_handle):
-			self.__delete_message_payload_from_s3(receipt_handle)
 			receipt_handle = self.__get_orig_receipt_handle(receipt_handle)
 		print("receipt_handle={}".format(receipt_handle))
 		self.sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
